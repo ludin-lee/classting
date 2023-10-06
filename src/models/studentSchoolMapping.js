@@ -12,7 +12,7 @@ export default function (sequelize, DataTypes) {
         allowNull: false,
       },
       schoolId: {
-        type: DataTypes.UUID,
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
     },
