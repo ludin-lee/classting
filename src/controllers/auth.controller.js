@@ -2,7 +2,6 @@ import { generatePassword } from "../utils/crypto.js";
 import { EXPIRES_IN, USER_TYPE } from "../config/const.js";
 import jwt from "jsonwebtoken";
 import db from "../models/index.js";
-import { AuthorizationError, InvalidParamsError } from "../config/errorCode.js";
 
 const { JWT_SECRET } = process.env;
 
@@ -11,16 +10,25 @@ export default class AuthController {
     const { email, password } = req.body;
     const { userType } = req.params;
     let userInfo;
+
     try {
-      if (!USER_TYPE[userType])
-        throw new InvalidParamsError("This user type does not exist.");
+      if (!USER_TYPE[userType]) {
+        res
+          .status(405)
+          .json({ result: false, message: "This user type does not exist." });
+        return;
+      }
 
       if (userType === USER_TYPE.admin)
         userInfo = await db.admin.findOne({ where: { email } });
       else userInfo = await db.student.findOne({ where: { email } });
 
-      if (!userInfo || userInfo?.password !== generatePassword(password))
-        throw new AuthorizationError();
+      if (!userInfo || userInfo?.password !== generatePassword(password)) {
+        res
+          .status(401)
+          .json({ result: false, message: "Wrong password or email" });
+        return;
+      }
 
       const token = jwt.sign(
         {

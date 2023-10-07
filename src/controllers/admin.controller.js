@@ -14,11 +14,15 @@ export default class AdminController {
 
       res.status(200).json({ result: true, data: { userInfo } });
     } catch (err) {
-      console.error(err);
-      res.status(err.status || 500).json({
-        result: false,
-        message: err.message || "Server Error",
-      });
+      if (err.original?.code === "ER_DUP_ENTRY") {
+        res.status(409).json({ result: false, message: "Duplicated data" });
+      } else {
+        console.error(err);
+        res.status(err.status || 500).json({
+          result: false,
+          message: err.message || "Server Error",
+        });
+      }
     }
   };
 }
