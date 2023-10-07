@@ -6,8 +6,15 @@ export default class Authorizer {
     req.locals = {};
     req.locals.token = token;
 
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    req.locals.decodedToken = decodedToken;
-    next();
+    try {
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+      req.locals.decodedToken = decodedToken;
+      next();
+    } catch (err) {
+      res.status(401).json({
+        result: false,
+        message: "Invalid token",
+      });
+    }
   };
 }
