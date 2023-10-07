@@ -1,17 +1,18 @@
 import express from "express";
-// import friendRotuer from "./friend.router.js";
-// import pointRouter from "./point.router.js";
-// import authRouter from "./auth.router.js";
-const router = express.Router();
+import authRouter from "./auth.router.js";
+import schoolRouter from "./school.router.js";
+import newsRouter from "./news.router.js";
+import subscribeRouter from "./subscribe.router.js";
 
-// TODO: All the code here should be deleted or changed appropriately in the future.
+const router = express.Router();
 
 router.get("/liveness", (req, res) => {
   res.status(204).send("OK");
 });
 
-// router.use("/friend", friendRotuer);
-// router.use("/point", pointRouter);
-// router.use("/auth", authRouter);
+router.use("/login", authRouter);
+router.use("/school", schoolRouter);
+router.use("/news", newsRouter);
+router.use("/subscribe", subscribeRouter);
 
 export default router;
