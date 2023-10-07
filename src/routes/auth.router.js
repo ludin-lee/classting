@@ -5,6 +5,6 @@ const router = express.Router();
 const authController = new AuthController();
 
 //GET_ADMIN_TOKEN
-router.post("/:userType", authController.Login);
+router.post("/:userType", authController.login);
 
 export default router;
