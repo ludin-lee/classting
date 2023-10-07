@@ -25,7 +25,7 @@ export default class AuthController {
         {
           id: userInfo.id,
           name: userInfo.name,
-          tokenFor,
+          tokenFor: userType,
         },
         JWT_SECRET,
         { expiresIn: EXPIRES_IN }
