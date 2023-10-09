@@ -10,15 +10,15 @@ const authorizer = new Authorizer();
 router.post("/:schoolId", authorizer.checkToken, newsController.createNews);
 
 //UPDATE_NEWS
-router.put("/:schoolId", authorizer.checkToken, newsController.updateNews);
+router.put("/", authorizer.checkToken, newsController.updateNews);
 
 //DELETE_NEWS
 router.delete("/:schoolId", authorizer.checkToken, newsController.deleteNews);
 
-//GET_SCHOOL_NEWS (by School ID)
-router.get("/", authorizer.checkToken, newsController.getNews);
+// //GET_SCHOOL_NEWS (by School ID)
+// router.get("/", authorizer.checkToken, newsController.getNews);
 
-//GET_ALL_SCHOOL_NEWS
-router.get("/all", authorizer.checkToken, newsController.getAllNews);
+// //GET_ALL_SCHOOL_NEWS
+// router.get("/all", authorizer.checkToken, newsController.getAllNews);
 
 export default router;
