@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { USER_TYPE } from "../config/const.js";
 import db from "../models/index.js";
 
@@ -116,16 +117,27 @@ export default class NewsController {
 
       const schoolInfo = await db.studentSchoolMapping.findAll({
         where: { studentId: id },
+        paranoid: false,
       });
 
-      const schoolIds = schoolInfo.map((school) => school.schoolId);
+      const newsInfo = [];
 
-      const allNewsInfo = await db.news.findAll({
-        where: { schoolId: schoolIds },
-        order: [["createdAt", "asc"]],
-      });
+      for (const subscription of schoolInfo) {
+        const { schoolId, createdAt, deletedAt } = subscription;
 
-      res.status(200).json({ result: true, data: { allNewsInfo } });
+        const schoolNews = await db.news.findAll({
+          where: {
+            schoolId,
+            createdAt: {
+              [Op.gte]: createdAt,
+              [Op.lte]: deletedAt || new Date(),
+            },
+          },
+        });
+        newsInfo.push(...schoolNews);
+      }
+
+      res.status(200).json({ result: true, data: { newsInfo } });
     } catch (err) {
       console.error(err);
       res.status(500).json({ result: false, message: "Server Error" });
