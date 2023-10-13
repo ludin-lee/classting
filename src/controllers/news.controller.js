@@ -106,6 +106,7 @@ export default class NewsController {
       res.status(500).json({ result: false, message: "Server Error" });
     }
   };
+
   getAllNews = async (req, res) => {
     const { id, tokenFor } = req.locals.decodedToken;
 
@@ -120,22 +121,31 @@ export default class NewsController {
         paranoid: false,
       });
 
-      const newsInfo = [];
+      const schoolIds = schoolInfo.map((school) => school.schoolId);
+      const createdAtArray = schoolInfo.map((school) => school.createdAt);
+      const deletedAtArray = schoolInfo.map((school) => school.deletedAt);
 
-      for (const subscription of schoolInfo) {
-        const { schoolId, createdAt, deletedAt } = subscription;
+      const subscriptions = schoolIds.map((schoolId, index) => {
+        return deletedAtArray[index]
+          ? db.sequelize.literal(`(
+          schoolId = ${schoolId} AND createdAt >= '${createdAtArray[
+              index
+            ].toISOString()}' AND createdAt <= '${deletedAtArray[
+              index
+            ].toISOString()}'
+        )`)
+          : db.sequelize.literal(`(
+          schoolId = ${schoolId} AND createdAt >= '${createdAtArray[
+              index
+            ].toISOString()}'
+        )`);
+      });
 
-        const schoolNews = await db.news.findAll({
-          where: {
-            schoolId,
-            createdAt: {
-              [Op.gte]: createdAt,
-              [Op.lte]: deletedAt || new Date(),
-            },
-          },
-        });
-        newsInfo.push(...schoolNews);
-      }
+      const newsInfo = await db.news.findAll({
+        where: {
+          [Op.or]: subscriptions,
+        },
+      });
 
       res.status(200).json({ result: true, data: { newsInfo } });
     } catch (err) {
