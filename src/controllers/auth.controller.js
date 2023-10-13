@@ -49,10 +49,8 @@ export default class AuthController {
         },
       });
     } catch (err) {
-      res.status(err.status || 500).json({
-        result: false,
-        message: err.message || "Server Error",
-      });
+      console.error(err);
+      res.status(500).json({ result: false, message: "Server Error" });
     }
   };
 }

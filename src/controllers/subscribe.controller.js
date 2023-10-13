@@ -1,4 +1,5 @@
 import { USER_TYPE } from "../config/const.js";
+import db from "../models/index.js";
 
 export default class SubscribeController {
   subscribeSchool = async (req, res) => {
@@ -11,7 +12,7 @@ export default class SubscribeController {
       }
 
       const subscribeInfo = await db.studentSchoolMapping.create({
-        studnetId: id,
+        studentId: id,
         schoolId,
       });
 
@@ -21,10 +22,7 @@ export default class SubscribeController {
         res.status(409).json({ result: false, message: "Duplicated data" });
       } else {
         console.error(err);
-        res.status(err.status || 500).json({
-          result: false,
-          message: err.message || "Server Error",
-        });
+        res.status(500).json({ result: false, message: "Server Error" });
       }
     }
   };
@@ -37,7 +35,7 @@ export default class SubscribeController {
         return;
       }
 
-      const affectedRows = await db.studentSchoolMapping.destory({
+      const affectedRows = await db.studentSchoolMapping.destroy({
         where: { schoolId, studentId: id },
       });
 
@@ -49,10 +47,7 @@ export default class SubscribeController {
       res.status(200).json({ result: true });
     } catch (err) {
       console.error(err);
-      res.status(err.status || 500).json({
-        result: false,
-        message: err.message || "Server Error",
-      });
+      res.status(500).json({ result: false, message: "Server Error" });
     }
   };
 }

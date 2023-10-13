@@ -1,4 +1,5 @@
 import { USER_TYPE } from "../config/const.js";
+import db from "../models/index.js";
 
 export default class NewsController {
   createNews = async (req, res) => {
@@ -20,10 +21,7 @@ export default class NewsController {
       res.status(200).json({ result: true, data: { newsInfo } });
     } catch (err) {
       console.error(err);
-      res.status(err.status || 500).json({
-        result: false,
-        message: err.message || "Server Error",
-      });
+      res.status(500).json({ result: false, message: "Server Error" });
     }
   };
 
@@ -51,14 +49,11 @@ export default class NewsController {
       res.status(200).json({ result: true });
     } catch (err) {
       console.error(err);
-      res.status(err.status || 500).json({
-        result: false,
-        message: err.message || "Server Error",
-      });
+      res.status(500).json({ result: false, message: "Server Error" });
     }
   };
   deleteNews = async (req, res) => {
-    const { newsId } = req.query;
+    const { newsId } = req.params;
     const { tokenFor } = req.locals.decodedToken;
 
     try {
@@ -77,12 +72,63 @@ export default class NewsController {
       res.status(200).json({ result: true });
     } catch (err) {
       console.error(err);
-      res.status(err.status || 500).json({
-        result: false,
-        message: err.message || "Server Error",
-      });
+      res.status(500).json({ result: false, message: "Server Error" });
     }
   };
-  getNews = () => {};
-  getAllNews = () => {};
+  getNews = async (req, res) => {
+    const { schoolId } = req.query;
+    const { id, tokenFor } = req.locals.decodedToken;
+    try {
+      if (tokenFor !== USER_TYPE.student) {
+        res.status(403).json({ result: false, message: "Permission Denied" });
+        return;
+      }
+
+      const newsInfo = await db.studentSchoolMapping.findAll({
+        where: { schoolId, studentId: id },
+        attributes: [],
+        include: {
+          model: db.school,
+          as: "school",
+          attributes: ["name", "region"],
+          include: {
+            model: db.news,
+            as: "news",
+            attributes: ["content", "createdAt"], // 가져올 열 선택
+          },
+        },
+      });
+
+      res.status(200).json({ result: true, data: { newsInfo } });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ result: false, message: "Server Error" });
+    }
+  };
+  getAllNews = async (req, res) => {
+    const { id, tokenFor } = req.locals.decodedToken;
+
+    try {
+      if (tokenFor !== USER_TYPE.student) {
+        res.status(403).json({ result: false, message: "Permission Denied" });
+        return;
+      }
+
+      const schoolInfo = await db.studentSchoolMapping.findAll({
+        where: { studentId: id },
+      });
+
+      const schoolIds = schoolInfo.map((school) => school.schoolId);
+
+      const allNewsInfo = await db.news.findAll({
+        where: { schoolId: schoolIds },
+        order: [["createdAt", "asc"]],
+      });
+
+      res.status(200).json({ result: true, data: { allNewsInfo } });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ result: false, message: "Server Error" });
+    }
+  };
 }

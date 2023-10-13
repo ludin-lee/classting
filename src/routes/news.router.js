@@ -13,12 +13,12 @@ router.post("/:schoolId", authorizer.checkToken, newsController.createNews);
 router.put("/", authorizer.checkToken, newsController.updateNews);
 
 //DELETE_NEWS
-router.delete("/:schoolId", authorizer.checkToken, newsController.deleteNews);
+router.delete("/:newsId", authorizer.checkToken, newsController.deleteNews);
 
-// //GET_SCHOOL_NEWS (by School ID)
-// router.get("/", authorizer.checkToken, newsController.getNews);
+//GET_SCHOOL_NEWS (by School ID)
+router.get("/", authorizer.checkToken, newsController.getNews);
 
-// //GET_ALL_SCHOOL_NEWS
-// router.get("/all", authorizer.checkToken, newsController.getAllNews);
+//GET_ALL_SCHOOL_NEWS
+router.get("/all", authorizer.checkToken, newsController.getAllNews);
 
 export default router;

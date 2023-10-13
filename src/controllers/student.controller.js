@@ -18,10 +18,7 @@ export default class StudentController {
         res.status(409).json({ result: false, message: "Duplicated data" });
       } else {
         console.error(err);
-        res.status(err.status || 500).json({
-          result: false,
-          message: err.message || "Server Error",
-        });
+        res.status(500).json({ result: false, message: "Server Error" });
       }
     }
   };
