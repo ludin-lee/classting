@@ -11,26 +11,26 @@ export default function associationAll(db) {
     onDelete: "cascade",
   });
 
-  //studentSchoolMapping-student 1:N 관계
-  db.student.belongsTo(db.studentSchoolMapping, {
-    as: "studentSchoolMapping",
+  //student-studentSchoolMapping 1:N 관계
+  db.studentSchoolMapping.belongsTo(db.student, {
+    as: "student",
     foreignKey: "studentId",
     onDelete: "cascade",
   });
-  db.studentSchoolMapping.hasMany(db.student, {
-    as: "students",
+  db.student.hasMany(db.studentSchoolMapping, {
+    as: "studentSchoolMappings",
     foreignKey: "studentId",
     onDelete: "cascade",
   });
 
-  //studentSchoolMapping-school 1:N 관계
-  db.school.belongsTo(db.studentSchoolMapping, {
-    as: "studentSchoolMapping",
+  //school-studentSchoolMapping 1:N 관계
+  db.studentSchoolMapping.belongsTo(db.school, {
+    as: "school",
     foreignKey: "schoolId",
     onDelete: "cascade",
   });
-  db.studentSchoolMapping.hasMany(db.school, {
-    as: "schools",
+  db.school.hasMany(db.studentSchoolMapping, {
+    as: "studentSchoolMappings",
     foreignKey: "schoolId",
     onDelete: "cascade",
   });
